@@ -1,35 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { getProducts } from '../../slices/productSlice';
 import { Package, AlertTriangle, PlusCircle, History, TrendingUp } from 'lucide-react';
 
 const ShopDashboard = () => {
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const dispatch = useDispatch();
+    const { products, isLoading } = useSelector((state) => state.products);
     const { user } = useSelector((state) => state.auth);
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const config = {
-                    headers: {
-                        Authorization: `Bearer ${user.token}`,
-                    },
-                };
-                const response = await axios.get('http://localhost:8080/api/shop/products', config);
-                setProducts(response.data);
-                setLoading(false);
-            } catch (err) {
-                console.error("Failed to fetch products", err);
-                setLoading(false);
-            }
-        };
-
         if (user) {
-            fetchProducts();
+            dispatch(getProducts());
         }
-    }, [user]);
+    }, [dispatch, user]);
 
     const lowStockCount = products.filter(p => p.quantity <= (p.minThreshold !== undefined && p.minThreshold !== null ? p.minThreshold : 5)).length;
 
@@ -75,7 +59,7 @@ const ShopDashboard = () => {
                     </div>
                     <div>
                         <p className="text-sm text-gray-500 font-medium">Total Products</p>
-                        <p className="text-3xl font-bold text-gray-800">{loading ? '-' : products.length}</p>
+                        <p className="text-3xl font-bold text-gray-800">{isLoading ? '-' : products.length}</p>
                     </div>
                 </div>
                 
@@ -85,7 +69,7 @@ const ShopDashboard = () => {
                     </div>
                     <div>
                         <p className="text-sm text-gray-500 font-medium">Low Stock Items</p>
-                        <p className="text-3xl font-bold text-red-600">{loading ? '-' : lowStockCount}</p>
+                        <p className="text-3xl font-bold text-red-600">{isLoading ? '-' : lowStockCount}</p>
                     </div>
                 </div>
 
@@ -107,7 +91,7 @@ const ShopDashboard = () => {
                         <Package size={20} className="text-gray-400"/>
                         Current Inventory
                     </h2>
-                    {loading && <span className="text-sm text-blue-500 animate-pulse">Updating...</span>}
+                    {isLoading && <span className="text-sm text-blue-500 animate-pulse">Updating...</span>}
                 </div>
                 
                 <div className="overflow-x-auto">
@@ -122,7 +106,7 @@ const ShopDashboard = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {loading ? (
+                            {isLoading ? (
                                 <tr><td colSpan="5" className="p-8 text-center text-gray-500">Loading inventory data...</td></tr>
                             ) : products.length === 0 ? (
                                 <tr><td colSpan="5" className="p-8 text-center text-gray-500">No products found in inventory.</td></tr>
