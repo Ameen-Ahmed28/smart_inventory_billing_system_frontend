@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-    baseURL: 'http://localhost:8080/api',
+    baseURL
+    // : 'http://localhost:8080/api',
+    : 'https://smart-inventory-billing-system-backend.onrender.com'    
 });
 
 // Add a request interceptor to include the token
