@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-    baseURL: 'https://smart-inventory-billing-system-backend-qgza.onrender.com/api',
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api', // Fallback to local
 });
 
 // Add a request interceptor to include the token
